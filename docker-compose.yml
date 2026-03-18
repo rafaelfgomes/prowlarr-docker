@@ -1,0 +1,37 @@
+services:
+  prowlarr:
+    image: ghcr.io/hotio/prowlarr
+    container_name: prowlarr
+    hostname: prowlarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TIMEZONE:-UTC}
+      - UMASK=002
+    volumes:
+      - ${PROWLARR_CONFIG_FOLDER:-./prowlarr-config}:/config
+    restart: unless-stopped
+    networks:
+      local:
+      external:
+        ipv4_address: ${PROWLARR_IP_ADDRESS}
+
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr
+    container_name: flaresolverr
+    hostname: flaresolverr
+    volumes:
+      - ${FLARESOLVERR_CONFIG_FOLDER:-./flaresolverr-config}:/config
+    environment:
+      - LOG_LEVEL=info
+      - TZ=${TIMEZONE-UTC}
+    restart: unless-stopped
+    networks:
+      local:
+
+networks:
+  local:
+    name: prowlarr-local-network
+  external:
+    external: true
+    name: ${EXTERNAL_NETWORK_NAME}
